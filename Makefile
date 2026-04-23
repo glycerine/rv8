@@ -69,7 +69,9 @@ OPT_FLAGS =     -O3 -fwrapv
 DEBUG_FLAGS =   -g
 WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-aliasing \
                 -Wno-unused-variable -Wno-unused-but-set-variable \
-                -Wno-stringop-truncation -Wno-bitwise-instead-of-logical \
+                -Wno-stringop-truncation -Wno-class-memaccess \
+                -Wno-int-in-bool-context -Wno-dangling-pointer \
+                -Wno-bitwise-instead-of-logical \
                 -Wno-delete-non-abstract-non-virtual-dtor -Wno-format \
                 -Wno-unknown-warning-option
 CPPFLAGS =
@@ -391,13 +393,10 @@ TEST_RAND_SRCS = $(SRC_DIR)/app/test-rand.cc
 TEST_RAND_OBJS = $(call cxx_src_objs, $(TEST_RAND_SRCS))
 TEST_RAND_BIN =  $(BIN_DIR)/test-rand
 
-# mmap-linux
-MMAP_LINUX_LDFLAGS = \
-	-shared -fPIC \
-	-Wl,-soname,mmap-linux.so
+# mmap-linux (static library, linked directly into binaries)
 MMAP_LINUX_SRCS =   $(SRC_DIR)/mem/mmap-linux.c $(SRC_DIR)/mem/mmap-core.c
 MMAP_LINUX_OBJS =   $(call cc_src_objs, $(MMAP_LINUX_SRCS))
-MMAP_LINUX_LIB =    $(LIB_DIR)/mmap-linux.so
+MMAP_LINUX_LIB =    $(LIB_DIR)/libriscv_mmap.a
 
 # mmap-macos
 MMAP_MACOS_LDFLAGS = \
@@ -482,8 +481,7 @@ linux-on-darwin:
 		$(LINUX_BIN_DIR)/test-mul \
 		$(LINUX_BIN_DIR)/test-operators \
 		$(LINUX_BIN_DIR)/test-printf \
-		$(LINUX_BIN_DIR)/test-rand \
-		$(LINUX_LIB_DIR)/mmap-linux.so
+		$(LINUX_BIN_DIR)/test-rand
 	@echo "=== linux-on-darwin build complete ==="
 	@ls -la $(LINUX_BIN_DIR)/
 
@@ -559,7 +557,9 @@ install:
 	install $(RV_SIM_BIN) $(DEST_DIR)/bin/rv-sim
 	install $(RV_SYS_BIN) $(DEST_DIR)/bin/rv-sys
 	install $(RV_JIT_BIN) $(DEST_DIR)/bin/rv-jit
+ifeq ($(OS),darwin)
 	install $(MMAP_LIB) $(DEST_DIR)/lib/
+endif
 
 # metadata targets
 
@@ -658,7 +658,7 @@ endif
 
 ifeq ($(ARCH),linux_x86_64)
 MMAP_LIB = $(MMAP_LINUX_LIB)
-MMAP_FLAGS = -Wl,-rpath,$(DEST_DIR)/lib
+MMAP_FLAGS = -ldl
 endif
 
 $(MMAP_MACOS_OBJS): CFLAGS += -fPIC
@@ -671,7 +671,7 @@ $(MMAP_MACOS_LIB): $(MMAP_MACOS_OBJS)
 
 $(MMAP_LINUX_LIB): $(MMAP_LINUX_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, SOLIB $@, $(CC) $(MMAP_LINUX_LDFLAGS) -o $@ $^ -ldl)
+	$(call cmd, AR $@, $(AR) cr $@ $^)
 
 # binary targets
 
@@ -747,7 +747,7 @@ cmd = @echo "$1"; $2
 endif
 
 $(OBJ_DIR)/%.o : $(ASMJIT_SRC_DIR)/%.cpp ; @mkdir -p $(@D) ;
-	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -Wno-class-memaccess -Wno-dangling-pointer -Wno-int-in-bool-context -c $< -o $@)
+	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc ; @mkdir -p $(@D) ;
 	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@)
