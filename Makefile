@@ -564,9 +564,7 @@ install:
 	install $(RV_SIM_BIN) $(DEST_DIR)/bin/rv-sim
 	install $(RV_SYS_BIN) $(DEST_DIR)/bin/rv-sys
 	install $(RV_JIT_BIN) $(DEST_DIR)/bin/rv-jit
-ifeq ($(OS),darwin)
-	install $(MMAP_LIB) $(DEST_DIR)/lib/
-endif
+	if [ "$(OS)" = "darwin" ]; then install $(MMAP_LIB) $(DEST_DIR)/lib/; fi
 
 # metadata targets
 
