@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cassert>
+#include <limits>
 #include <random>
 #include <type_traits>
 

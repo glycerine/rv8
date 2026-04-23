@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <functional>
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>

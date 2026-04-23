@@ -5,6 +5,8 @@
 #ifndef rv_fpu_h
 #define rv_fpu_h
 
+#include <limits>
+
 namespace riscv {
 
 #if defined __GNUC__ && defined __x86_64__ && defined __SSE__

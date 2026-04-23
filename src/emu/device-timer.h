@@ -5,6 +5,8 @@
 #ifndef rv_device_timer_h
 #define rv_device_timer_h
 
+#include <limits>
+
 namespace riscv {
 
 	/* Timer MMIO device */

@@ -5,6 +5,8 @@
 #ifndef rv_processor_impl_h
 #define rv_processor_impl_h
 
+#include <limits>
+
 namespace riscv {
 
 	/* Interpreter Exit Causes */

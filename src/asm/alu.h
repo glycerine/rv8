@@ -5,6 +5,8 @@
 #ifndef rv_alu_h
 #define rv_alu_h
 
+#include <limits>
+
 namespace riscv {
 
 	/* multiply high unsigned */

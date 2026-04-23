@@ -6,6 +6,7 @@
 #define rv_jit_emitter_rv32_h
 
 #include <bitset>
+#include <limits>
 
 namespace riscv {
 

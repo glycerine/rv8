@@ -5,6 +5,8 @@
 #ifndef rv_processor_base_h
 #define rv_processor_base_h
 
+#include <limits>
+
 namespace riscv {
 
 	/* RV32 integer register */
