@@ -74,7 +74,7 @@ CCFLAGS =       -std=c11 -D_DEFAULT_SOURCE $(CFLAGS)
 CXXFLAGS =      -std=c++1y -fno-rtti -fno-exceptions $(CFLAGS)
 LDFLAGS =       
 ASM_FLAGS =     -S -masm=intel
-MACOS_LDFLAGS = -Wl,-pagezero_size,0x1000 -Wl,-no_pie -image_base 0x7ffe00000000
+MACOS_LDFLAGS = -Wl,-pagezero_size,0x1000
 LINUX_LDFLAGS = -pie -Wl,-Ttext-segment=0x7ffe00000000
 LIBCXX_FLAGS =  -stdlib=libcxx
 PTH_CPPFLAGS =  -pthread
@@ -117,13 +117,17 @@ ifeq ($(call check_cxx_opt,$(CXX),cc,$(NOEXEC_FLAGS)), 0)
 LDFLAGS +=      $(NOEXEC_FLAGS)
 endif
 endif
-# check if we can link with a small zero page and text at high address
+# check if we can link with a small zero page (macOS only)
+ifeq ($(OS),darwin)
 ifeq ($(call check_cxx_opt,$(CXX),cc,$(MACOS_LDFLAGS)), 0)
 LDFLAGS +=      $(MACOS_LDFLAGS)
 endif
-# check if we can static link text at high address
+endif
+# check if we can static link text at high address (Linux only)
+ifeq ($(OS),linux)
 ifeq ($(call check_cxx_opt,$(CXX),cc,$(LINUX_LDFLAGS)), 0)
 LDFLAGS +=      $(LINUX_LDFLAGS)
+endif
 endif
 
 # check whether to enable sanitizer
@@ -396,8 +400,7 @@ MMAP_LINUX_LIB =    $(LIB_DIR)/mmap-linux.so
 # mmap-macos
 MMAP_MACOS_LDFLAGS = \
 	-dynamiclib -fPIC \
-	-install_name $(DEST_DIR)/lib/mmap-macos.dylib \
-	-image_base 0x7ffe80000000
+	-install_name @executable_path/../lib/mmap-macos.dylib
 MMAP_MACOS_SRCS =   $(SRC_DIR)/mem/mmap-macos.c $(SRC_DIR)/mem/mmap-core.c
 MMAP_MACOS_OBJS =   $(call cc_src_objs, $(MMAP_MACOS_SRCS))
 MMAP_MACOS_LIB =    $(LIB_DIR)/mmap-macos.dylib
