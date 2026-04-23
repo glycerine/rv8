@@ -67,7 +67,10 @@ INCLUDES :=     -I$(TOP_DIR)/src/abi \
                 -I$(TOP_DIR)/$(ASMJIT_SRC_DIR)/asmjit
 OPT_FLAGS =     -O3 -fwrapv
 DEBUG_FLAGS =   -g
-WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-aliasing
+WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-aliasing \
+                -Wno-unused-variable -Wno-unused-but-set-variable \
+                -Wno-stringop-truncation -Wno-bitwise-instead-of-logical \
+                -Wno-unknown-warning-option
 CPPFLAGS =
 CFLAGS =        $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
 CCFLAGS =       -std=c11 -D_DEFAULT_SOURCE $(CFLAGS)
@@ -743,7 +746,7 @@ cmd = @echo "$1"; $2
 endif
 
 $(OBJ_DIR)/%.o : $(ASMJIT_SRC_DIR)/%.cpp ; @mkdir -p $(@D) ;
-	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@)
+	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -Wno-class-memaccess -Wno-dangling-pointer -c $< -o $@)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc ; @mkdir -p $(@D) ;
 	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@)
