@@ -390,9 +390,7 @@ TEST_RAND_BIN =  $(BIN_DIR)/test-rand
 # mmap-linux
 MMAP_LINUX_LDFLAGS = \
 	-shared -fPIC \
-	-Wl,-soname,mmap-linux.so \
-	-Wl,-Ttext-segment=0x7ffe80000000 \
-	-Wl,-rpath,$(DEST_DIR)/lib/mmap-linux.so
+	-Wl,-soname,mmap-linux.so
 MMAP_LINUX_SRCS =   $(SRC_DIR)/mem/mmap-linux.c $(SRC_DIR)/mem/mmap-core.c
 MMAP_LINUX_OBJS =   $(call cc_src_objs, $(MMAP_LINUX_SRCS))
 MMAP_LINUX_LIB =    $(LIB_DIR)/mmap-linux.so
@@ -446,6 +444,37 @@ BINARIES = $(RV_META_BIN) \
            $(TEST_RAND_BIN)
 
 ASSEMBLY = $(TEST_CC_ASM)
+
+# cross-compile linux binaries on darwin using zig
+ZIG_CC =  zig cc -target x86_64-linux-gnu
+ZIG_CXX = zig c++ -target x86_64-linux-gnu
+ZIG_AR =  zig ar
+LINUX_BIN_DIR = build/linux_x86_64/bin
+LINUX_LIB_DIR = build/linux_x86_64/lib
+
+linux-on-darwin:
+	@echo "=== Step 1: build native rv-meta and generate meta files ==="
+	$(MAKE) meta
+	@echo "=== Step 2: cross-compile for linux_x86_64 using zig ==="
+	$(MAKE) SKIP_META=1 OS=linux CPU=x86_64 \
+		CC="$(ZIG_CC)" CXX="$(ZIG_CXX)" LD="$(ZIG_CXX)" AR="$(ZIG_AR)" \
+		$(LINUX_BIN_DIR)/rv-bin \
+		$(LINUX_BIN_DIR)/rv-jit \
+		$(LINUX_BIN_DIR)/rv-sim \
+		$(LINUX_BIN_DIR)/rv-sys \
+		$(LINUX_BIN_DIR)/test-bits \
+		$(LINUX_BIN_DIR)/test-encoder \
+		$(LINUX_BIN_DIR)/test-endian \
+		$(LINUX_BIN_DIR)/test-jit \
+		$(LINUX_BIN_DIR)/test-mmap \
+		$(LINUX_BIN_DIR)/test-mmu \
+		$(LINUX_BIN_DIR)/test-mul \
+		$(LINUX_BIN_DIR)/test-operators \
+		$(LINUX_BIN_DIR)/test-printf \
+		$(LINUX_BIN_DIR)/test-rand \
+		$(LINUX_LIB_DIR)/mmap-linux.so
+	@echo "=== linux-on-darwin build complete ==="
+	@ls -la $(LINUX_BIN_DIR)/
 
 # build rules
 
@@ -546,6 +575,9 @@ meta: $(RV_OPANDS_HDR) $(RV_CODEC_HDR) $(RV_JIT_HDR) $(RV_JIT_SRC) \
 	$(RV_FPU_HDR) $(RV_FPU_GEN) $(RV_INTERP_HDR) $(RV_CONSTR_HDR) \
 	$(TEST_CC_SRC)
 
+# when SKIP_META=1, generated files are assumed to already exist (for cross-compilation)
+ifneq ($(SKIP_META),1)
+
 $(RV_OPANDS_HDR): $(RV_META_BIN) $(RV_META_DATA)
 	$(call cmd, META $@, $(call parse_meta,-A,$@))
 
@@ -584,6 +616,8 @@ $(RV_CONSTR_HDR): $(RV_META_BIN) $(RV_META_DATA)
 
 $(TEST_CC_SRC): $(RV_META_BIN) $(RV_META_DATA)
 	$(call cmd, META $@, $(call parse_meta,-CC,$@))
+
+endif
 
 # lib targets
 
