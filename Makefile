@@ -80,7 +80,9 @@ WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-al
                 -Wno-stringop-truncation -Wno-format \
                 -Wno-unknown-warning-option
 CXX_WARN_FLAGS = -Wno-class-memaccess -Wno-int-in-bool-context -Wno-dangling-pointer \
-                -Wno-bitwise-instead-of-logical -Wno-delete-non-abstract-non-virtual-dtor
+                -Wno-bitwise-instead-of-logical -Wno-delete-non-abstract-non-virtual-dtor \
+                -Wno-nontrivial-memcall -Wno-implicit-const-int-float-conversion \
+                -Wno-unused-function
 CPPFLAGS =
 CFLAGS =        $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
 CCFLAGS =       -std=c11 -D_DEFAULT_SOURCE $(CFLAGS)
@@ -473,8 +475,10 @@ linux-on-darwin:
 	@echo "=== Step 1: build native rv-meta and generate meta files ==="
 	$(MAKE) meta
 	@echo "=== Step 2: cross-compile for linux_x86_64 using zig ==="
-	$(MAKE) SKIP_META=1 OS=linux CPU=x86_64 \
+	ZIG_PROGRESS=0 $(MAKE) SKIP_META=1 OS=linux CPU=x86_64 \
 		CC="$(ZIG_CC)" CXX="$(ZIG_CXX)" LD="$(ZIG_CXX)" AR="$(ZIG_AR)" \
+		RANLIB=true \
+		LIBCPP_FLAGS= LIBCXX_FLAGS= \
 		$(LINUX_BIN_DIR)/rv-bin \
 		$(LINUX_BIN_DIR)/rv-jit \
 		$(LINUX_BIN_DIR)/rv-sim \
