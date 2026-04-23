@@ -445,6 +445,13 @@ BINARIES = $(RV_META_BIN) \
 
 ASSEMBLY = $(TEST_CC_ASM)
 
+# build rules
+
+all: meta $(BINARIES) $(ASSEMBLY)
+clean: ; @echo "CLEAN $(BUILD_DIR)"; rm -rf $(BUILD_DIR)
+backup: clean ; dir=$$(basename $$(pwd)) ; cd .. && tar -czf $${dir}-backup-$$(date '+%Y%m%d').tar.gz $${dir}
+dist: clean ; dir=$$(basename $$(pwd)) ; cd .. && tar --exclude .git -czf $${dir}-$$(date '+%Y%m%d').tar.gz $${dir}
+
 # cross-compile linux binaries on darwin using zig
 ZIG_CC =  zig cc -target x86_64-linux-gnu
 ZIG_CXX = zig c++ -target x86_64-linux-gnu
@@ -475,13 +482,6 @@ linux-on-darwin:
 		$(LINUX_LIB_DIR)/mmap-linux.so
 	@echo "=== linux-on-darwin build complete ==="
 	@ls -la $(LINUX_BIN_DIR)/
-
-# build rules
-
-all: meta $(BINARIES) $(ASSEMBLY)
-clean: ; @echo "CLEAN $(BUILD_DIR)"; rm -rf $(BUILD_DIR)
-backup: clean ; dir=$$(basename $$(pwd)) ; cd .. && tar -czf $${dir}-backup-$$(date '+%Y%m%d').tar.gz $${dir}
-dist: clean ; dir=$$(basename $$(pwd)) ; cd .. && tar --exclude .git -czf $${dir}-$$(date '+%Y%m%d').tar.gz $${dir}
 
 # docs
 
