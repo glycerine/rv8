@@ -69,15 +69,14 @@ OPT_FLAGS =     -O3 -fwrapv
 DEBUG_FLAGS =   -g
 WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-aliasing \
                 -Wno-unused-variable -Wno-unused-but-set-variable \
-                -Wno-stringop-truncation -Wno-class-memaccess \
-                -Wno-int-in-bool-context -Wno-dangling-pointer \
-                -Wno-bitwise-instead-of-logical \
-                -Wno-delete-non-abstract-non-virtual-dtor -Wno-format \
+                -Wno-stringop-truncation -Wno-format \
                 -Wno-unknown-warning-option
+CXX_WARN_FLAGS = -Wno-class-memaccess -Wno-int-in-bool-context -Wno-dangling-pointer \
+                -Wno-bitwise-instead-of-logical -Wno-delete-non-abstract-non-virtual-dtor
 CPPFLAGS =
 CFLAGS =        $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
 CCFLAGS =       -std=c11 -D_DEFAULT_SOURCE $(CFLAGS)
-CXXFLAGS =      -std=c++1y -fno-rtti -fno-exceptions $(CFLAGS)
+CXXFLAGS =      -std=c++1y -fno-rtti -fno-exceptions $(CFLAGS) $(CXX_WARN_FLAGS)
 LDFLAGS =       
 ASM_FLAGS =     -S -masm=intel
 MACOS_LDFLAGS = -Wl,-pagezero_size,0x1000
