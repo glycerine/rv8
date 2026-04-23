@@ -28,6 +28,14 @@ endif
 # linker, archiver and ragel parser generator
 LD :=           $(CXX)
 AR :=           $(shell which ar)
+RANLIB :=       $(shell which ranlib)
+ifeq ($(OS),darwin)
+ARFLAGS =       crS
+RANLIB_FLAGS =  -no_warning_for_no_symbols
+else
+ARFLAGS =       cr
+RANLIB_FLAGS =
+endif
 
 # compiler function tests
 check_cxx_opt = $(shell T=$$(mktemp /tmp/test.XXXX); \
@@ -626,27 +634,27 @@ endif
 
 $(ASMJIT_LIB): $(ASMJIT_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 $(RV_ASM_LIB): $(RV_ASM_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 $(RV_ELF_LIB): $(RV_ELF_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 $(RV_MODEL_LIB): $(RV_MODEL_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 $(RV_GEN_LIB): $(RV_GEN_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 $(RV_UTIL_LIB): $(RV_UTIL_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 # mmap interception
 
@@ -670,7 +678,7 @@ $(MMAP_MACOS_LIB): $(MMAP_MACOS_OBJS)
 
 $(MMAP_LINUX_LIB): $(MMAP_LINUX_OBJS)
 	@mkdir -p $(@D) ;
-	$(call cmd, AR $@, $(AR) cr $@ $^)
+	$(call cmd, AR $@, $(AR) $(ARFLAGS) $@ $^ && $(RANLIB) $(RANLIB_FLAGS) $@)
 
 # binary targets
 
