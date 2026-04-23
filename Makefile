@@ -70,6 +70,7 @@ DEBUG_FLAGS =   -g
 WARN_FLAGS =    -Wall -Wsign-compare -Wno-deprecated-declarations -Wno-strict-aliasing \
                 -Wno-unused-variable -Wno-unused-but-set-variable \
                 -Wno-stringop-truncation -Wno-bitwise-instead-of-logical \
+                -Wno-delete-non-abstract-non-virtual-dtor -Wno-format \
                 -Wno-unknown-warning-option
 CPPFLAGS =
 CFLAGS =        $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
@@ -746,7 +747,7 @@ cmd = @echo "$1"; $2
 endif
 
 $(OBJ_DIR)/%.o : $(ASMJIT_SRC_DIR)/%.cpp ; @mkdir -p $(@D) ;
-	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -Wno-class-memaccess -Wno-dangling-pointer -c $< -o $@)
+	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -Wno-class-memaccess -Wno-dangling-pointer -Wno-int-in-bool-context -c $< -o $@)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc ; @mkdir -p $(@D) ;
 	$(call cmd, CXX $@, $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@)
